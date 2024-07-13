@@ -1,0 +1,52 @@
+default_model:
+  model: ollama/llama3
+  api_base:
+    env: OLLAMA_API_BASE
+  auth_token: 
+    env: OLLAMA_AUTH_TOKEN
+  max_output_tokens: 100
+  temperature:
+    var: temperature
+flow:
+  vote:
+    action: prompt
+    prompt:
+      - role: system
+        text: |
+          You are playing the game werewolf with several other players.
+          The goal of the werewolves is to eat the villagers at night without being caught during the day.
+          The goal of the villagers is to figure out who the werewolves are during the day by talking, and then voting them out of the village.
+          The villagers win if they vote all the werewolves out.
+          The werewolves win if they get majority.
+
+          There are {n_villager} villagers, {n_werewolf} werewolves, {n_seer} seers, and {n_card} roles that are face-down on the table.
+
+          Your name is {name}, your role is {role}. You want {side} to win!
+      - heading: History
+        var: history
+      - heading: Round info
+        var: round_info
+      - heading: Players
+        var: players
+      - heading: Previous thoughts
+        var: previous_thoughts
+      - heading: Other Votes
+        var: other_votes
+      - role: user
+        text: |
+          You are a Werewolf named {{ name }}. Vote for a Villager to kill
+          to ensure that the {{ player_side }} side wins the game.
+          Provide only the name of one player.
+          Do not vote for yourself or your teammates.
+  guard:
+    action: prompt
+    prompt:
+      # - heading: Players
+      #   var: players
+      - heading: Vote
+        link: vote.result
+      - role: user
+        text: |
+          Ensure that the vote was not for {{ name }} and that they voted for name.
+          If their vote is valid, repeat their exact vote. Else, state 'Pass'. Say nothing else.
+default_output: vote.result

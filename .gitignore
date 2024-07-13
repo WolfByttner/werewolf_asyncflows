@@ -1,0 +1,9 @@
+venv
+.python-version
+.env
+.idea
+.vscode
+.DS_Store
+.alpackages
+.snapshots
+__pycache__

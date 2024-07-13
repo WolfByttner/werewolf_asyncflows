@@ -1,0 +1,142 @@
+# asyncflows-language-server
+
+
+default_model:
+  model: ollama/llama3
+  api_base:
+    env: OLLAMA_API_BASE
+  auth_token: 
+    env: OLLAMA_AUTH_TOKEN
+  max_output_tokens: 200
+
+flow:
+  self_stream:
+    action: prompt
+    prompt:
+      - role: system
+        text: |
+          You are playing the game werewolf with several other players.
+          The goal of the werewolves is to eat the villagers at night without being caught during the day.
+          The goal of the villagers is to figure out who the werewolves are during the day by talking, and then voting them out of the village.
+          The villagers win if they vote all the werewolves out.
+          The werewolves win if they get majority.
+
+          Your name is {{ player }}, your role is {{ role }}. You want {{ side }} to win!
+      - heading: History
+        var: history
+      - heading: Round info
+        var: round_info
+      - heading: Players
+        var: players
+      - heading: Previous thoughts
+        var: previous_thoughts
+      - role: user
+        text: |
+          You are {{ task }}.
+          Share your internal thoughts. How can your side, the {{ player_side }} win the game?
+          Start by naming the players you suspect are werewolves or villagers and why.
+
+  speak_villager_day:
+    action: prompt
+    prompt:
+      - role: system
+        text: |
+          You are playing the game werewolf with several other players.
+          The goal of the werewolves is to eat the villagers at night without being caught during the day.
+          The goal of the villagers is to figure out who the werewolves are during the day by talking, and then voting them out of the village.
+          The villagers win if they vote all the werewolves out.
+          The werewolves win if they get majority.
+
+          Your name is {{ player }}, your role is {{ role }}. You want {{ side }} to win!
+      - heading: Your internal thoughts (do not share these)
+        link: self_stream.result
+      - role: user
+        text: |
+          Discuss with the other players and make your side, the {{ player_side }} win!
+
+  speak_werewolf_day:
+    action: prompt
+    prompt:
+      - role: system
+        text: |
+          You are playing the game werewolf with several other players.
+          The goal of the werewolves is to eat the villagers at night without being caught during the day.
+          The goal of the villagers is to figure out who the werewolves are during the day by talking, and then voting them out of the village.
+          The villagers win if they vote all the werewolves out.
+          The werewolves win if they get majority.
+
+          Your name is {{ player }}, your role is {{ role }}. You want {{ side }} to win!
+      - heading: Your internal thoughts (do not share these)
+        link: self_stream.result
+      - role: user
+        text: |
+          Discuss with the other players and make your side, the {{ player_side }} win!
+
+  vote_werewolf_night:
+    action: prompt
+    prompt:
+      - role: system
+        text: |
+          You are playing the game werewolf with several other players.
+          The goal of the werewolves is to eat the villagers at night without being caught during the day.
+          The goal of the villagers is to figure out who the werewolves are during the day by talking, and then voting them out of the village.
+          The villagers win if they vote all the werewolves out.
+          The werewolves win if they get majority.
+
+          Your name is {{ player }}, your role is {{ role }}. You want {{ side }} to win!
+      - heading: Your internal thoughts (do not share these)
+        link: self_stream.result
+      - heading: Other Votes
+        var: other_votes
+      - role: user
+        text: |
+          Vote to maul a villager to ensure that the {{ player_side }} side wins the game.
+          Provide only the name of one player.
+          You need to reach agreement with the other werewolves to maul a villager.
+
+  vote_werewolf_day:
+    action: prompt
+    prompt:
+      - role: system
+        text: |
+          You are playing the game werewolf with several other players.
+          The goal of the werewolves is to eat the villagers at night without being caught during the day.
+          The goal of the villagers is to figure out who the werewolves are during the day by talking, and then voting them out of the village.
+          The villagers win if they vote all the werewolves out.
+          The werewolves win if they get majority.
+
+          Your name is {{ player }}, your role is {{ role }}. You want {{ side }} to win!
+      - heading: Your internal thoughts (do not share these)
+        link: self_stream.result
+      - heading: Other Votes
+        var: other_votes
+      - role: user
+        text: |
+          Vote to lynch a villager to ensure that the {{ player_side }} side wins the game.
+          Provide only the name of one player.
+          The villages must agree to lynch a werewolf.
+
+  vote_villager_day:
+    action: prompt
+    prompt:
+      - role: system
+        text: |
+          You are playing the game werewolf with several other players.
+          The goal of the werewolves is to eat the villagers at night without being caught during the day.
+          The goal of the villagers is to figure out who the werewolves are during the day by talking, and then voting them out of the village.
+          The villagers win if they vote all the werewolves out.
+          The werewolves win if they get majority.
+
+          Your name is {{ player }}, your role is {{ role }}. You want {{ side }} to win!
+      - heading: Your internal thoughts (do not share these)
+        link: self_stream.result
+      - heading: Other Votes
+        var: other_votes
+      - role: user
+        text: |
+          Vote to lynch a werewolf to ensure that the {{ player_side }} side wins the game.
+          Provide only the name of one player.
+          You need to reach agreement with the other villages to lynch a werewolf.
+
+
+default_output: vote_villager_day.result
